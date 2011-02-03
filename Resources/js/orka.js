@@ -1,18 +1,36 @@
+/* Templating */
 (function (window) {
-
-	// pick up template from DOM
-	var templates = {};
-	var DOMtemplates = document.querySelectorAll('[template-name]');
-	for(var i = 0, len = DOMtemplates.length; i < len; ++i) {
-		var name = DOMtemplates[i].getAttribute('template-name');
+	var templates = {}, resources, fn = ['var t=document.createElement("div");with(obj){t.innerHTML="', '', '"}return t.firstChild;'];
+	
+	function template(filename) {
+		filename += filename.indexOf('.html') == -1 ? ".html" : "";
+				
+		if (filename in templates) {
+			return templates[filename]; // return cached version
+		}
 		
-		var str = DOMtemplates[i].innerHTML(/[\r\t\n]+/g, " ").replace("{%","'+").replace("%}","+'");
+		resources = resources || Titanium.Filesystem.getResourcesDirectory();
+		var file = Titanium.Filesystem.getFile(resources, "templates", filename);
 		
-		templates[name] = new Function("item", "var tpl = document.createElement('div'); tpl.innerHTML = '" + str + "'; return tpl.firstChild;");
 		
-		DOMtemplates[i].parentNode.removeChild(DOMtemplates[i]);
+		if (!file.exists()) {
+			return null; // file doesn't exist
+		}
+		
+		var str = file.read() + "";
+		fn[1] = str.replace(/[\r\t\n]+/g, " ")
+			.replace(/"/g, '\\\"')
+			.replace(/{%/g, '"+')
+			.replace(/%}/g, '+"');
+		
+		templates[filename] = new Function("obj", fn.join(""));
+		return templates[filename];
 	}
-	DOMtemplates = null;
-	delete DOMtemplates;
+	
+	window.template = template;
+})(this);
+
+
+(function (window) {
 	
 })(this);

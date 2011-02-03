@@ -1,0 +1,9 @@
+<li id="twit-{%item.id%}" class="vcard" template-name="tweet">
+	<img src="{%item.user.profile_image_url%}" alt="photo of {%item.user.name%}">
+	<cite for="status-{%item.id%}">
+		<span class="fn">{%item.user.name%}</span>
+		<span class="nickname">{%item.user.screen_name%}</span>
+	</cite>
+	<blockquote id="status-{%item.id%}">{%item.text%}</blockquote>
+	<time datetime="{%item.created_at%}">{%item.created_at%}</time>
+</li>
